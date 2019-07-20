@@ -7,7 +7,7 @@
 A two-dimensional plan is represented by a one-dimensional array.   
 A node has up to eight directions and no edges.  
 A weight is stored in the node, the higher the cost of passing,  
-the greater the <0 is not passable;
+the less than ZERO is not passable;
 
 
 用浏览器打开 index.html
