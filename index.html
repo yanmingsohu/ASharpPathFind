@@ -1,0 +1,214 @@
+<html>
+<body>
+  <style>
+  .item {
+    display: inline-block;
+    width: 15px; height: 15px;
+  }
+  .road {
+    opacity: 0.3;
+  }
+  #bs {
+    margin: 50px;
+  }
+  .pass {
+    background-color: burlywood;
+  }
+  #go {
+    background-color: burlywood; width: 100px;
+  }
+  </style>
+  
+  <div>
+    <button id='all'>All</button>
+    <button id='none'>None</button>
+    <button id='go'>Go</button>
+    <input type='checkbox' id='obl' checked/>Oblique Move
+  </div>
+  <div>
+    Row:<input id='row' value='30'/> Column:<input id='col' value='50'/>
+    <button id='rebuild'>Rebuild</button>
+    <button id='random'>Random</button>
+  </div>
+  
+  <div>
+    <button id='save'>Save</button>
+    <button id='load'>Load</button>
+    <select id='files'></select>
+  </div>
+  
+  <div id='bs'></div>
+  <div id='message'></div>
+  
+  <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+  <script src='asharp.js'></script>
+  <script>
+    let bs      = $('#bs');
+    let rowi    = $("#row");
+    let coli    = $('#col');
+    let msg     = $('#message');
+    let files   = $('#files');
+    let obl     = $('#obl');
+    let fp      = new ASharpFindPath(rowi.val(), coli.val());
+    let buttons = [];
+    let tid     = 0;
+    
+    build();
+    $('#rebuild').click(()=>{
+      fp = new ASharpFindPath(rowi.val(), coli.val());
+      build();
+    });
+    
+    $('#all').click(setAll(true));
+    $('#none').click(setAll(false));
+    $('#go').click(go);
+    
+    for (let i=0; i<10; ++i) {
+      let name;
+      try {
+        //console.log(localStorage.getItem('file:'+ i));
+        let file = JSON.parse(localStorage.getItem('file:'+ i));
+        name = file ? file.name : ' null';
+      } catch(e) {
+        name = ' fail';
+      }
+      $("<option>").appendTo(files).text(i + name).attr("value", i);
+    }
+    
+    $('#save').click(function() {
+      let i = files.val();
+      let f = {
+        name: new Date().toLocaleString(), 
+        data: fp.$arr,
+        r: fp.$row,
+        c: fp.$col,
+      };
+      localStorage.setItem('file:'+ i, JSON.stringify(f));
+    });
+    
+    $('#load').click(function() {
+      let i = files.val();
+      let f = JSON.parse(localStorage.getItem('file:' +i));
+      rowi.val(f.r);
+      coli.val(f.c);
+      fp = new ASharpFindPath(f.r, f.c);
+      fp.$arr = f.data;
+      build();
+    });
+    
+    $('#random').click(function() {
+      const r = fp.$row;
+      const c = fp.$col;
+      
+      for (let a=0; a<r; ++a) {
+        for (let b=0; b<c; ++b) {
+          if (Math.random() > 0.3) {
+            fp.setWeights(b, a, 0);
+          } else {
+            fp.setWeights(b, a, -1);
+          }
+        }
+      }
+      fp.setWeights(0, 0, 0);
+      fp.setWeights(c-1, r-1, 0);
+      build();
+    });
+    
+    
+    function go() {
+      try {
+        fp.setOblique(obl.prop('checked'));
+        clearTimeout(tid);
+        msg.text('begin');
+        bs.find('button').removeClass('pass');
+        //console.log(fp.$arr);
+        
+        let node = fp.find(0, 0, coli.val()-1, rowi.val()-1);
+        let step = 0;
+        
+        if (!node) {
+          msg.text("No path to find");
+          return;
+        }
+        drawNext();
+        
+        function drawNext() {
+          ++step;
+          let b = buttons[node.y * coli.val() + node.x];
+          b.addClass('pass');
+          node = node.from;
+          if (node) {
+            tid = setTimeout(drawNext, 50);
+          } else {
+            msg.text("Over, "+ step +" step. "+ 
+                fp.$cal_count +' Calculation overhead.');
+          }
+        }
+      } catch(e) {
+        msg.text(e.message);
+        throw e;
+      }
+    }
+    
+    
+    function build() {
+      bs.html('');
+      const r = fp.$row;
+      const c = fp.$col;
+      
+      for (let a=0; a<r; ++a) {
+        let rowdiv = $("<div>").appendTo(bs);
+        for (let b=0; b<c; ++b) {
+          let button = $("<button class='item'>").appendTo(rowdiv);
+          button.click(switchBut(button, a, b, fp.getWeights(b, a)));
+          buttons[c *a + b] = button;
+        }
+      }
+      //console.log(r, c);
+    }
+    
+    
+    function switchBut(self, r, c, w) {
+      if (w >= 0) {
+        setRoad();
+      } else {
+        setBlock();
+      }
+      
+      function setRoad() {
+        self.addClass('road');
+        fp.setWeights(c, r, 0);
+      }
+      
+      function setBlock() {
+        self.removeClass('road');
+        fp.setWeights(c, r, -1);
+      }
+      
+      return function click() {
+        let road = self.is('.road');
+        if (!road) {
+          setRoad();
+        } else {
+          setBlock();
+        }
+      }
+    }
+    
+    
+    function setAll(isRoad) {
+      return function() {
+        bs.find('.item').each(function() {
+          let thiz = $(this);
+          if (isRoad) {
+            thiz.addClass('road');
+          } else {
+            thiz.removeClass('road');
+          }
+        });
+        fp.setAllWeights(isRoad ?0 :-1);
+      }
+    }
+  </script>
+</body>
+</html>
