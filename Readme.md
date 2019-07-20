@@ -13,3 +13,21 @@ the greater the <0 is not passable;
 用浏览器打开 index.html
 
 Open index.html with a browser
+
+
+## DEMO
+
+```js
+let fp = new ASharpFindPath(10, 10);
+
+// Block the Road
+fp.setWeights(8, 9, -1);
+
+// From (0, 0) to (10, 10)
+let node = fp.find(0, 0, 10, 10);
+
+// Reverse looking for the parent node
+while (node) {
+  node = node.from;
+}
+```
