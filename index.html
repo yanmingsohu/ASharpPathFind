@@ -40,8 +40,8 @@
   
   <div id='bs'></div>
   <div id='message'></div>
-  <a href='https://github.com/yanmingsohu/ASharpPathFind'>
-    https://github.com/yanmingsohu/ASharpPathFind</a>
+  <a href='https://github.com/yanmingsohu/AStarPathFind'>
+    https://github.com/yanmingsohu/AStarPathFind</a>
   
   <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
   <script src='asharp.js'></script>
@@ -52,13 +52,13 @@
     let msg     = $('#message');
     let files   = $('#files');
     let obl     = $('#obl');
-    let fp      = new ASharpFindPath(rowi.val(), coli.val());
+    let fp      = new AStarFindPath(rowi.val(), coli.val());
     let buttons = [];
     let tid     = 0;
     
     build();
     $('#rebuild').click(()=>{
-      fp = new ASharpFindPath(rowi.val(), coli.val());
+      fp = new AStarFindPath(rowi.val(), coli.val());
       build();
     });
     
@@ -94,7 +94,7 @@
       let f = JSON.parse(localStorage.getItem('file:' +i));
       rowi.val(f.r);
       coli.val(f.c);
-      fp = new ASharpFindPath(f.r, f.c);
+      fp = new AStarFindPath(f.r, f.c);
       fp.$arr = f.data;
       build();
     });

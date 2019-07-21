@@ -3,7 +3,7 @@
 // 节点中保存一个权重, 越高表示通过的开销越大, <0 表示不可通过;
 // by. yanming [https://github.com/yanmingsohu/ASharpPathFind]
 //
-class ASharpFindPath {
+class AStarFindPath {
   
   constructor(row, column) {
     this.$arr = new Array(row * column + 1);

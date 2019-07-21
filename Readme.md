@@ -18,7 +18,7 @@ Open index.html with a browser
 ## DEMO
 
 ```js
-let fp = new ASharpFindPath(10, 10);
+let fp = new AStarFindPath(10, 10);
 
 // Block the Road
 fp.setWeights(8, 9, -1);
