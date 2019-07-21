@@ -34,23 +34,25 @@ class AStarFindPath {
   
   find(begin_x0, y0, end_x1, y1) {
     if (begin_x0 >= this.$col) throw new Error("begin x> max column");
-    if (y0 >= this.$row) throw new Error("begin y> max row");
-    if (end_x1 >= this.$col) throw new Error("end x> max column");
-    if (y1 >= this.$row) throw new Error("end y> max row");
+    if (y0       >= this.$row) throw new Error("begin y> max row");
+    if (end_x1   >= this.$col) throw new Error("end x> max column");
+    if (y1       >= this.$row) throw new Error("end y> max row");
     
-    const thiz = this;
-    const route = [];
+    const thiz  = this;
+    const route = {};
     const stack = [];
-    let count = 0;
-    stack.push({x:begin_x0, y:y0, cost:0});
+    const top   = {x:begin_x0, y:y0, cost:0};
+    let count   = 0;
+    stack.push(top);
     
     while (stack.length > 0) {
       ++count;
       stack.sort(_by_cost);
       let next = stack.shift();
-      route[next.x +'|'+ next.y] = next.from;
+      route[next.x +'|'+ next.y] = 1;
       // Show Calculation overhead
       //console.log(count, stack.length, next.x, next.y);
+      //console.log(count, route);
       
       if (next.x == end_x1 && next.y == y1) {
         this.$cal_count = count;
@@ -77,12 +79,14 @@ class AStarFindPath {
     }
     
     function _push(x, y, from) {
-      if (route[x +'|'+ y] == null) {
+      const key = x +'|'+ y;
+      if (route[key] == null) {
+        route[key] = 1;
         let cost = thiz.$arr[thiz.$col *y +x +1];
         if (cost >= 0) {
-          route[x +'|'+ y] = 1;
           let distance = _distance(x, end_x1) + _distance(y, y1);
-          stack.push({x, y, from, cost: cost + distance});
+          let newnode = {x, y, from, cost: cost + distance};
+          stack.push(newnode);
         }
       }
     }
@@ -96,3 +100,6 @@ class AStarFindPath {
     }
   }
 }
+
+// IF running on Nodejs >>>
+// module.exports = AStarFindPath;

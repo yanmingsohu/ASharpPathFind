@@ -12,10 +12,13 @@
     margin: 50px;
   }
   .pass {
-    background-color: burlywood;
+    background-color: burlywood; opacity: 0.7;
   }
   #go {
     background-color: burlywood; width: 100px;
+  }
+  #bs div {
+    white-space:nowrap;
   }
   </style>
   
@@ -44,7 +47,7 @@
     https://github.com/yanmingsohu/AStarPathFind</a>
   
   <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
-  <script src='asharp.js'></script>
+  <script src='astar.js'></script>
   <script>
     let bs      = $('#bs');
     let rowi    = $("#row");
@@ -175,8 +178,10 @@
         bs.find('button').removeClass('pass');
         //console.log(fp.$arr);
         
+        let used = Date.now();
         let node = fp.find(0, 0, coli.val()-1, rowi.val()-1);
         let step = 0;
+        used = Date.now() - used;
         
         if (!node) {
           msg.text("No path to find");
@@ -192,8 +197,8 @@
           if (node) {
             tid = setTimeout(drawNext, 40);
           } else {
-            msg.text("Over, "+ step +" step. "+ 
-                fp.$cal_count +' Calculation overhead.');
+            msg.text("Over, "+ step +" step, "+ fp.$cal_count 
+                +' Calculation overhead, '+ used +' ms.');
           }
         }
       } catch(e) {
